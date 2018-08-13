@@ -62,6 +62,12 @@ extension VideoPlayerView {
         VideoPlayer.shared.stop()
         VideoPlayer.shared.remove(delegate: self)
     }
+    
+    func resetLayer() {
+        let layer = VideoPlayer.shared.layer()
+        layer.frame = playingView.bounds
+        playingView.layer.addSublayer(layer)
+    }
 }
 
 extension VideoPlayerView {

@@ -63,7 +63,7 @@ class VideoPlayer: NSObject {
     
     let playingInfo = VideoPlayerInfo()
     
-    var volume: Float = 0.0 {
+    var volume: Float = 1.0 {
         didSet { player.volume = volume }
     }
     
