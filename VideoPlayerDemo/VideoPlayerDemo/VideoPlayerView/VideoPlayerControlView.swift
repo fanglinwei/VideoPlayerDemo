@@ -10,9 +10,6 @@ import UIKit
 
 protocol VideoPlayerControlViewable: NSObjectProtocol {
     
-    /// 是否与PlayerView同步大小
-    var isSyncBounds: Bool { get }
-    
     /// 设置代理对象
     ///
     /// - Parameter delegate: 代理
@@ -168,6 +165,7 @@ class VideoPlayerControlView: UIView {
     
     private func setupLayout() {
         
+        let center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
         loadingView.center = center
         stateButton.center = center
         stateButton.bounds = CGRect(x: 0, y: 0, width: 66, height: 66)
@@ -269,10 +267,6 @@ extension VideoPlayerControlView {
 }
 
 extension VideoPlayerControlView: VideoPlayerControlViewable {
-    
-    var isSyncBounds: Bool {
-        return true
-    }
     
     func set(delegate: VideoPlayerControlViewDelegate) {
         self.delegate = delegate

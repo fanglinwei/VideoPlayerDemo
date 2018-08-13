@@ -41,10 +41,6 @@ class VideoPlayerView: UIView {
         super.layoutSubviews()
         
         playingView.frame = bounds
-        
-        if let controlView = controlView, controlView.isSyncBounds {
-            controlView.frame = bounds
-        }
     }
     
     private func setup() {
