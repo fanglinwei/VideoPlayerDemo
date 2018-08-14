@@ -51,7 +51,6 @@ class VideoPlayerView: UIView {
 extension VideoPlayerView {
     
     func play(url: URL) {
-        
         VideoPlayer.shared.add(delegate: self)
         let layer = VideoPlayer.shared.prepare(url: url)
         layer.frame = playingView.bounds

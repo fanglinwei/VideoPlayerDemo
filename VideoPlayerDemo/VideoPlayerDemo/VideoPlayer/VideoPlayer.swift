@@ -335,7 +335,7 @@ extension VideoPlayer {
                     
                 case .failed:
                     // 异常
-                    print(player.error?.localizedDescription ?? "无法获取错误信息")
+                    print(item.error?.localizedDescription ?? "无法获取错误信息")
                     error()
                 }
                 
