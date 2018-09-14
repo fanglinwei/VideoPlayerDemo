@@ -1,0 +1,23 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'VideoPlayerDemo' do
+  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+# 七牛播放器
+pod 'PLPlayerKit'
+#pod 'PLPlayerKit', :podspec => 'https://raw.githubusercontent.com/pili-engineering/PLPlayerKit/master/PLPlayerKit-Universal.podspec'
+
+  # Pods for VideoPlayerDemo
+
+  target 'VideoPlayerDemoTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'VideoPlayerDemoUITests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end

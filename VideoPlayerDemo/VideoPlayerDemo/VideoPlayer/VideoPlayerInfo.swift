@@ -6,8 +6,34 @@
 //
 
 import MediaPlayer.MPNowPlayingInfoCenter
+import MediaPlayer.MPRemoteCommandCenter
 
-class VideoPlayerInfo: VideoPlayerDelegate {
+class VideoPlayerInfo: VideoPlayerDelagete {
+    
+    var isRemoteEnabled: Bool = true {
+        didSet {
+            if isRemoteEnabled {
+                addRemoteCommand()
+            } else {
+                removeRemoteCommand()
+            }
+        }
+    }
+    
+    init() {
+        setupRemoteCommand()
+        addRemoteCommand()
+    }
+    
+    deinit {
+        removeRemoteCommand()
+    }
+    
+    weak var player: VideoPlayerable?
+    
+    func set(_ player: VideoPlayerable) {
+        self.player = player
+    }
     
     /// 设置播放信息
     ///
@@ -50,11 +76,12 @@ class VideoPlayerInfo: VideoPlayerDelegate {
         guard var info = MPNowPlayingInfoCenter.default().nowPlayingInfo else {
             return
         }
-        let player = VideoPlayer.shared
-        info[MPMediaItemPropertyPlaybackDuration] = player.totalTime() ?? 0
-        info[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: player.currentRate())
+        guard let player = player else { return }
+        
+        info[MPMediaItemPropertyPlaybackDuration] = player.totalTime ?? 0
+        info[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: player.currentRate)
         info[MPNowPlayingInfoPropertyDefaultPlaybackRate] = NSNumber(value: 1.0)
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = NSNumber(value: player.currentTime() ?? 0)
+        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = NSNumber(value: player.currentTime ?? 0)
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     
@@ -83,11 +110,53 @@ class VideoPlayerInfo: VideoPlayerDelegate {
         updatePlayingInfo()
     }
     
-    func updated(totalTime: Float) {
+    func updated(totalTime: TimeInterval) {
         updatePlayingInfo()
     }
     
     func seekFinish() {
         updatePlayingInfo()
+    }
+}
+
+extension VideoPlayerInfo {
+    
+    /// 设置远程控制
+    private func setupRemoteCommand() {
+        let remote = MPRemoteCommandCenter.shared()
+        remote.playCommand.addTarget { [weak self] (event) -> MPRemoteCommandHandlerStatus in
+            guard let this = self else { return .commandFailed }
+            guard let player = this.player else { return .commandFailed }
+            
+            switch player.state {
+            case .playing: break
+            case .paused: player.play()
+            case .error, .stopped, .finish: return .noSuchContent
+            }
+            return .success
+        }
+        remote.pauseCommand.addTarget { [weak self] (event) -> MPRemoteCommandHandlerStatus in
+            guard let this = self else { return .commandFailed }
+            guard let player = this.player else { return .commandFailed }
+            
+            switch player.state {
+            case .playing: player.pause()
+            case .paused: break
+            case .error, .stopped, .finish: return .noSuchContent
+            }
+            return .success
+        }
+    }
+    /// 添加远程控制
+    private func addRemoteCommand() {
+        let remote = MPRemoteCommandCenter.shared()
+        remote.playCommand.isEnabled = true // 播放控制
+        remote.pauseCommand.isEnabled = true // 暂停控制
+    }
+    /// 移除远程控制
+    private func removeRemoteCommand() {
+        let remote = MPRemoteCommandCenter.shared()
+        remote.playCommand.isEnabled = false // 播放控制
+        remote.pauseCommand.isEnabled = false // 暂停控制
     }
 }
