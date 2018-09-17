@@ -1,17 +1,8 @@
-//
-//  VideoPlayerUtils.swift
-//  VideoPlayerDemo
-//
-//  Created by 李响 on 2018/6/1.
-//  Copyright © 2018年 李响. All rights reserved.
-//
-
 import Foundation
 import UIKit
 
 enum VideoPlayerUtils {}
 
-/// 延迟任务
 extension VideoPlayerUtils {
     
     typealias DelayTask = (_ cancel : Bool) -> Void

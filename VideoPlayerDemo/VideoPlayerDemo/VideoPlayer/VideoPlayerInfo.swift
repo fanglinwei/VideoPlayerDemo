@@ -1,10 +1,3 @@
-//
-//  VideoPlayerInfo.swift
-//
-//  Created by 李响 on 2018/5/29.
-//  Copyright © 2018年 LiveTrivia. All rights reserved.
-//
-
 import MediaPlayer.MPNowPlayingInfoCenter
 import MediaPlayer.MPRemoteCommandCenter
 

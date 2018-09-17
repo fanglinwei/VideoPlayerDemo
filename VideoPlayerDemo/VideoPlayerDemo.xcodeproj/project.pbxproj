@@ -157,13 +157,6 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		C96026D6211D83EF00EA3249 /* VideoPlayerView */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = VideoPlayerView;
-			sourceTree = "<group>";
-		};
 		C967C99B20BFC5DE003E9303 = {
 			isa = PBXGroup;
 			children = (
@@ -189,7 +182,6 @@
 		C967C9A620BFC5DE003E9303 /* VideoPlayerDemo */ = {
 			isa = PBXGroup;
 			children = (
-				C96026D6211D83EF00EA3249 /* VideoPlayerView */,
 				C967C9D520BFC5F9003E9303 /* VideoPlayer */,
 				C967C9A720BFC5DE003E9303 /* AppDelegate.swift */,
 				C967C9A920BFC5DE003E9303 /* ViewController.swift */,

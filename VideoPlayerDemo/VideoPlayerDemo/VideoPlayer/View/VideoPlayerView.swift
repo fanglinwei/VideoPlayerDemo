@@ -1,11 +1,3 @@
-//
-//  VideoPlayerView.swift
-//  VideoPlayerDemo
-//
-//  Created by LEE on 2018/9/11.
-//  Copyright © 2018年 李响. All rights reserved.
-//
-
 import UIKit
 import AVKit
 

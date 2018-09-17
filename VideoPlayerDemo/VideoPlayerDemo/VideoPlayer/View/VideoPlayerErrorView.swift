@@ -1,11 +1,3 @@
-//
-//  VideoPlayerErrorView.swift
-//  VideoPlayerDemo
-//
-//  Created by 李响 on 2018/9/13.
-//  Copyright © 2018年 李响. All rights reserved.
-//
-
 import UIKit
 
 protocol VideoPlayerErrorViewable: NSObjectProtocol {

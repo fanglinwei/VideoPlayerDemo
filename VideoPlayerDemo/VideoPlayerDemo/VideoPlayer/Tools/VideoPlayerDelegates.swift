@@ -1,10 +1,3 @@
-//
-//  VideoPlayerDelegates.swift
-//
-//  Created by 李响 on 2018/5/31.
-//  Copyright © 2018年 李响. All rights reserved.
-//
-
 import Foundation
 
 protocol PlayerDelagetes: NSObjectProtocol {

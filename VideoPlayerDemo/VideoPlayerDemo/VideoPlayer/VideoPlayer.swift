@@ -1,11 +1,3 @@
-//
-//  VideoPlayer.swift
-//  VideoPlayerDemo
-//
-//  Created by 方林威 on 2018/9/13.
-//  Copyright © 2018年 李响. All rights reserved.
-//
-
 import Foundation
 import UIKit
 import AVFoundation

@@ -11,7 +11,6 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var playerView: UIView!
-    @IBOutlet weak var plPlayerView: UIView!
     
     private lazy var controlView = VideoPlayerControlView()
     private lazy var coverView = VideoPlayerCoverView()
@@ -67,9 +66,5 @@ class ViewController: UIViewController {
         errorView.frame = playerView.frame
         finishView.frame = playerView.frame
         pv?.frame = playerView.bounds
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
     }
 }

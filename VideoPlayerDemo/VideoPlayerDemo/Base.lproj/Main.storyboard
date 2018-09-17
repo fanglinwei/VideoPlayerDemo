@@ -26,27 +26,16 @@
                                     <constraint firstAttribute="width" secondItem="xSy-D6-vg5" secondAttribute="height" multiplier="16:9" id="B2q-b8-V06"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZqH-ee-k39">
-                                <rect key="frame" x="0.0" y="261" width="375" height="211"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="ZqH-ee-k39" secondAttribute="height" multiplier="16:9" id="Lkt-j3-dmW"/>
-                                </constraints>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="xSy-D6-vg5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="26J-ab-VLv"/>
                             <constraint firstItem="xSy-D6-vg5" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="7OB-Ka-kjo"/>
-                            <constraint firstItem="ZqH-ee-k39" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="F2J-Nd-0Vp"/>
-                            <constraint firstItem="ZqH-ee-k39" firstAttribute="top" secondItem="xSy-D6-vg5" secondAttribute="bottom" constant="30" id="aGK-hC-KOv"/>
-                            <constraint firstItem="ZqH-ee-k39" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="wUh-au-0nP"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="xSy-D6-vg5" secondAttribute="trailing" id="xF3-nX-aBs"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="plPlayerView" destination="ZqH-ee-k39" id="FME-sn-8fA"/>
                         <outlet property="playerView" destination="xSy-D6-vg5" id="ajc-GG-wel"/>
                     </connections>
                 </viewController>
