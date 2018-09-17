@@ -300,6 +300,9 @@ extension PLVideoPlayer: VideoPlayerable {
         
         player.delegate = self
         player.isBackgroundPlayEnable = true
+        player.loopPlay = isLoop
+        player.setVolume(Float(volume))
+        player.isMute = isMuted
         self.player = player
         playerView = VideoPlayerView(.pl(view))
         playerView.backgroundColor = .clear

@@ -53,10 +53,11 @@ class ViewController: UIViewController {
         provider.set(player: player)
         self.provider = provider
         
+        player.isLoop = false
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-            player.stop()
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+//            player.stop()
+//        }
     }
     
     override func viewDidLayoutSubviews() {

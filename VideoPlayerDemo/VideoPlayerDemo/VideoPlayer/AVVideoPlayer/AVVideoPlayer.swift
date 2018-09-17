@@ -249,12 +249,15 @@ extension AVVideoPlayer {
     
     /// 播放结束通知
     @objc func itemDidPlayToEndTime(_ notification: NSNotification) {
-        
         pause()
-        seek(to: 0.0) {
-            self.delegate { $0.updated(currentTime: 0.0) }
-            guard !self.isLoop else { return }
-            self.state = .finish
+        seek(to: 0.0) { [weak self] in
+            guard let this = self else { return }
+            if this.isLoop {
+                this.delegate { $0.updated(currentTime: 0.0) }
+                this.play()
+            } else {
+                this.state = .finish
+            }
         }
     }
     
@@ -332,6 +335,8 @@ extension AVVideoPlayer: VideoPlayerable {
         player = AVPlayer(playerItem: item)
         player.actionAtItemEnd = .pause
         player.volume = Float(volume)
+        player.isMuted = isMuted
+        
         if #available(iOS 10.0, *) {
             player.automaticallyWaitsToMinimizeStalling = false
         }
