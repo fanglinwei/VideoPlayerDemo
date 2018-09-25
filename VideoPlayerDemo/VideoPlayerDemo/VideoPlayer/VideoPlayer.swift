@@ -37,7 +37,7 @@ extension VideoPlayer {
         DispatchQueue.global().async {
             do {
                 let session = AVAudioSession.sharedInstance()
-                try session.setCategory(AVAudioSessionCategoryPlayback)
+                try session.setCategory(.playback, mode: .default)
                 try session.setActive(true)
             } catch {
                 print("音频会话创建失败")

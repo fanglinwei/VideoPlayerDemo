@@ -32,7 +32,7 @@ class VideoPlayerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override var contentMode: UIViewContentMode {
+    override var contentMode: UIView.ContentMode {
         get {
             return super.contentMode
         }

@@ -9,9 +9,9 @@ class PLVideoPlayer: NSObject {
     private(set) var loading: Bool = false {
         didSet {
             if loading {
-                delegate { $0.loadingBegin() }
+                delegate { $0.videoPlayerLoadingBegin(self) }
             } else {
-                delegate { $0.loadingEnd() }
+                delegate { $0.videoPlayerLoadingEnd(self) }
             }
         }
     }
@@ -20,15 +20,15 @@ class PLVideoPlayer: NSObject {
         didSet {
             switch state {
             case .playing:
-                delegate { $0.playing() }
+                delegate { $0.videoPlayerPlaying(self) }
             case .paused:
-                delegate { $0.paused() }
+                delegate { $0.videoPlayerPaused(self) }
             case .stopped:
-                delegate { $0.stopped() }
+                delegate { $0.videoPlayerStopped(self) }
             case .finish:
-                delegate { $0.finish() }
+                delegate { $0.videoPlayerFinish(self) }
             case .error:
-                delegate { $0.error() }
+                delegate { $0.videoPlayerError(self) }
             }
         }
     }
@@ -67,7 +67,7 @@ class PLVideoPlayer: NSObject {
                           selector: #selector(timerAction),
                           userInfo: nil,
                           repeats: true)
-        RunLoop.main.add(timer, forMode: .commonModes)
+        RunLoop.main.add(timer, forMode: .common)
         return timer
     } ()
     private var player: PLPlayer?
@@ -90,9 +90,9 @@ class PLVideoPlayer: NSObject {
     }
     
     private func setupNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionRouteChange(_:)), name: .AVAudioSessionRouteChange, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
         
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionInterruption(_:)), name: .AVAudioSessionInterruption, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionInterruption(_:)), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
     }
     
     private func pauseNoUser() {
@@ -105,12 +105,12 @@ extension PLVideoPlayer {
     
     @objc func timerAction() {
         
-        if let currenTime = currentTime {
-            delegate { $0.updated(currentTime: currenTime) }
+        if let time = currentTime {
+            delegate { $0.videoPlayer(self, updatedCurrent: time) }
         }
         
-        if let totalTime = totalTime {
-            delegate { $0.updated(totalTime: totalTime) }
+        if let time = totalTime {
+            delegate { $0.videoPlayer(self, updatedTotal: time) }
         }
     }
     
@@ -123,7 +123,7 @@ extension PLVideoPlayer {
         }
         guard let _ = player else { return }
         
-        switch AVAudioSessionRouteChangeReason(rawValue: UInt(reason)) {
+        switch AVAudioSession.RouteChangeReason(rawValue: UInt(reason)) {
         case .oldDeviceUnavailable?:
             DispatchQueue.main.async {
                 self.pauseNoUser()
@@ -141,7 +141,7 @@ extension PLVideoPlayer {
         }
         guard let _ = player else { return }
         
-        switch AVAudioSessionInterruptionType(rawValue: UInt(type)) {
+        switch AVAudioSession.InterruptionType(rawValue: UInt(type)) {
         case .began?:
             if !userPaused, state == .playing { pauseNoUser() }
         case .ended?:
@@ -248,12 +248,12 @@ extension PLVideoPlayer: PLPlayerDelegate {
             progress \(progress)\n
             """)
         
-        delegate { $0.updated(bufferProgress: progress)}
+        delegate { $0.videoPlayer(self, updatedBuffer: progress) }
     }
     
     func player(_ player: PLPlayer, seekToCompleted isCompleted: Bool) {
         // 恢复监听
-        delegate { $0.seekFinish() }
+        delegate { $0.videoPlayerSeekFinish(self) }
         seekCompletion?()
         seekCompletion = nil
         loading = false
@@ -363,7 +363,7 @@ extension PLVideoPlayer: VideoPlayerable {
         }
         
         loading = true
-        player.seek(to: CMTimeMakeWithSeconds(time, 1))
+        player.seek(to: CMTimeMakeWithSeconds(time, preferredTimescale: 1))
         seekCompletion = completion
     }
     

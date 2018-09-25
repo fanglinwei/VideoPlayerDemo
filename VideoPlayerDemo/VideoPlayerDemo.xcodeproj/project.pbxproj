@@ -330,10 +330,12 @@
 					};
 					C967C9B720BFC5E0003E9303 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1000;
 						TestTargetID = C967C9A320BFC5DE003E9303;
 					};
 					C967C9C220BFC5E0003E9303 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1000;
 						TestTargetID = C967C9A320BFC5DE003E9303;
 					};
 				};
@@ -664,7 +666,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lee.VideoPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -683,7 +685,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lee.VideoPlayerDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -704,7 +706,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lee.VideoPlayerDemoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VideoPlayerDemo.app/VideoPlayerDemo";
 			};
@@ -726,7 +728,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lee.VideoPlayerDemoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VideoPlayerDemo.app/VideoPlayerDemo";
 			};
@@ -747,7 +749,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lee.VideoPlayerDemoUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = VideoPlayerDemo;
 			};
@@ -768,7 +770,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lee.VideoPlayerDemoUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = VideoPlayerDemo;
 			};

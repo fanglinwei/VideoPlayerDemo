@@ -58,25 +58,25 @@ extension VideoPlayerProvider {
         }
         
         switch player.state {
-        case .playing:  playing()
-        case .paused:   paused()
-        case .stopped:  stopped()
-        case .finish:   finish()
-        case .error:    error()
+        case .playing:  videoPlayerPlaying(player)
+        case .paused:   videoPlayerPaused(player)
+        case .stopped:  videoPlayerStopped(player)
+        case .finish:   videoPlayerFinish(player)
+        case .error:    videoPlayerError(player)
         }
     }
 }
 
 extension VideoPlayerProvider: VideoPlayerDelagete {
     
-    func loadingBegin() {
+    func videoPlayerLoadingBegin(_ player: VideoPlayerable) {
         controlView.loadingBegin()
     }
-    func loadingEnd() {
+    func videoPlayerLoadingEnd(_ player: VideoPlayerable) {
         controlView.loadingEnd()
     }
     
-    func playing() {
+    func videoPlayerPlaying(_ player: VideoPlayerable) {
         controlView.set(state: true)
         controlView.isHidden = false
         finishView.isHidden = true
@@ -84,7 +84,7 @@ extension VideoPlayerProvider: VideoPlayerDelagete {
         coverView.isHidden = true
     }
     
-    func paused() {
+    func videoPlayerPaused(_ player: VideoPlayerable) {
         controlView.set(state: false)
         controlView.isHidden = false
         finishView.isHidden = true
@@ -92,40 +92,40 @@ extension VideoPlayerProvider: VideoPlayerDelagete {
         coverView.isHidden = true
     }
     
-    func stopped() {
+    func videoPlayerStopped(_ player: VideoPlayerable) {
         controlView.isHidden = true
         finishView.isHidden = true
         errorView.isHidden = true
         coverView.isHidden = false
     }
     
-    func finish() {
+    func videoPlayerFinish(_ player: VideoPlayerable) {
         controlView.isHidden = true
         finishView.isHidden = false
         errorView.isHidden = true
         coverView.isHidden = true
     }
     
-    func error() {
+    func videoPlayerError(_ player: VideoPlayerable) {
         controlView.isHidden = true
         finishView.isHidden = true
         errorView.isHidden = false
         coverView.isHidden = true
     }
     
-    func updated(bufferProgress progress: Double) {
+    func videoPlayer(_ player: VideoPlayerable, updatedBuffer progress: Double) {
         controlView.set(buffer: progress, animated: true)
     }
     
-    func updated(totalTime time: TimeInterval) {
+    func videoPlayer(_ player: VideoPlayerable, updatedTotal time: Double) {
         controlView.set(total: time)
     }
     
-    func updated(currentTime time: TimeInterval) {
+    func videoPlayer(_ player: VideoPlayerable, updatedCurrent time: Double) {
         controlView.set(current: time)
     }
     
-    func seekFinish() {
+    func videoPlayerSeekFinish(_ player: VideoPlayerable) {
         
     }
 }

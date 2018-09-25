@@ -49,7 +49,7 @@ class VideoPlayerControlView: UIView {
     private weak var delegate: VideoPlayerControlViewDelegate?
     
     lazy var loadingView: UIActivityIndicatorView = {
-        $0.activityIndicatorViewStyle = .white
+        $0.style = .white
         $0.hidesWhenStopped = true
         return $0
     }( UIActivityIndicatorView() )

@@ -23,7 +23,7 @@ extension PlayerDelagetes {
         delegates.remove(at: index)
     }
     
-    func delegate(_ operat: @escaping (Element) -> Void) {
+    func delegate(_ operat: (Element) -> Void) {
         delegates = delegates.filter({ $0.object != nil })
         for delegate in delegates {
             guard let object = delegate.object else { continue }

@@ -10,9 +10,9 @@ class AVVideoPlayer: NSObject {
     private(set) var loading: Bool = false {
         didSet {
             if loading {
-                delegate { $0.loadingBegin() }
+                delegate { $0.videoPlayerLoadingBegin(self) }
             } else {
-                delegate { $0.loadingEnd() }
+                delegate { $0.videoPlayerLoadingEnd(self) }
             }
         }
     }
@@ -21,15 +21,15 @@ class AVVideoPlayer: NSObject {
         didSet {
             switch state {
             case .playing:
-                delegate { $0.playing() }
+                delegate { $0.videoPlayerPlaying(self) }
             case .paused:
-                delegate { $0.paused() }
+                delegate { $0.videoPlayerPaused(self) }
             case .stopped:
-                delegate { $0.stopped() }
+                delegate { $0.videoPlayerStopped(self) }
             case .finish:
-                delegate { $0.finish() }
+                delegate { $0.videoPlayerFinish(self) }
             case .error:
-                delegate { $0.error() }
+                delegate { $0.videoPlayerError(self) }
             }
         }
     }
@@ -91,13 +91,13 @@ class AVVideoPlayer: NSObject {
         
         NotificationCenter.default.addObserver(self, selector: #selector(itemPlaybackStalled(_:)), name: .AVPlayerItemPlaybackStalled, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionRouteChange(_:)), name: .AVAudioSessionRouteChange, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
         
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionInterruption(_:)), name: .AVAudioSessionInterruption, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionInterruption(_:)), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
         
-        NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
 }
 
@@ -149,8 +149,10 @@ extension AVVideoPlayer {
         let interval = CMTime(value: 1, timescale: 10)
         playerTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
             [weak self] (time) in
+            guard let this = self else { return }
+            
             let time = CMTimeGetSeconds(time)
-            self?.delegate{ $0.updated(currentTime: time) }
+            this.delegate{ $0.videoPlayer(this, updatedCurrent: time) }
         }
     }
     private func removeObserver() {
@@ -189,7 +191,7 @@ extension AVVideoPlayer {
                 guard let new = new as? Int else { return }
                 guard let old = old as? Int else { return }
                 guard new != old else { return }
-                switch AVPlayerItemStatus(rawValue: new) ?? .unknown {
+                switch AVPlayerItem.Status(rawValue: new) ?? .unknown {
                 case .unknown: break
                 case .readyToPlay:
                     // 播放
@@ -203,8 +205,8 @@ extension AVVideoPlayer {
                 
             case kvo_item_duration:
                 // 获取总时长
-                if let totalTime = totalTime {
-                    delegate { $0.updated(totalTime: totalTime) }
+                if let time = totalTime {
+                    delegate { $0.videoPlayer(self, updatedTotal: time) }
                 }
                 
             case kvo_item_loadedTimeRanges:
@@ -225,19 +227,13 @@ extension AVVideoPlayer {
                     totalDuration \(totalTime)
                     progress \(progress)\n
                     """)
-                delegate { $0.updated(bufferProgress: progress) }
+                delegate { $0.videoPlayer(self, updatedBuffer: progress) }
                 
             case kvo_item_playbackLikelyToKeepUp:
                 // 缓存是否可以播放
                 guard let isKeep = new as? Bool else { return }
                 
-                if isKeep {
-                    loading = false
-                    delegate{ $0.loadingEnd() }
-                } else {
-                    loading = true
-                    delegate{ $0.loadingBegin() }
-                }
+                loading = !isKeep
                 
             default: break
             }
@@ -253,7 +249,7 @@ extension AVVideoPlayer {
         seek(to: 0.0) { [weak self] in
             guard let this = self else { return }
             if this.isLoop {
-                this.delegate { $0.updated(currentTime: 0.0) }
+                this.delegate { $0.videoPlayer(this, updatedCurrent: 0.0) }
                 this.play()
             } else {
                 this.state = .finish
@@ -275,7 +271,7 @@ extension AVVideoPlayer {
         }
         guard let _ = player.currentItem else { return }
         
-        switch AVAudioSessionRouteChangeReason(rawValue: UInt(reason)) {
+        switch AVAudioSession.RouteChangeReason(rawValue: UInt(reason)) {
         case .oldDeviceUnavailable?:
             DispatchQueue.main.async {
                 self.pauseNoUser()
@@ -293,7 +289,7 @@ extension AVVideoPlayer {
         }
         guard let _ = player.currentItem else { return }
         
-        switch AVAudioSessionInterruptionType(rawValue: UInt(type)) {
+        switch AVAudioSession.InterruptionType(rawValue: UInt(type)) {
         case .began?:
             if !userPaused, state == .playing { pauseNoUser() }
         case .ended?:
@@ -394,7 +390,7 @@ extension AVVideoPlayer: VideoPlayerable {
         removeObserver()
         isSeeking = true
         
-        let changeTime = CMTimeMakeWithSeconds(time, 1)
+        let changeTime = CMTimeMakeWithSeconds(time, preferredTimescale: 1)
         item.seek(to: changeTime, completionHandler: { [weak self] (finish) in
             guard let this = self else { return }
             
@@ -403,7 +399,7 @@ extension AVVideoPlayer: VideoPlayerable {
             // 恢复监听
             this.addObserver()
             this.isSeeking = false
-            this.delegate{ $0.seekFinish() }
+            this.delegate{ $0.videoPlayerSeekFinish(this) }
             completion()
         })
     }

@@ -83,31 +83,31 @@ class VideoPlayerInfo: VideoPlayerDelagete {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
-    func playing() {
+    func videoPlayerLoadingBegin(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }
     
-    func loadingBegin() {
+    func videoPlayerLoadingEnd(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }
     
-    func loadingEnd() {
+    func videoPlayerPlaying(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }
     
-    func paused() {
+    func videoPlayerPaused(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }
     
-    func finish() {
+    func videoPlayerFinish(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }
     
-    func updated(totalTime: TimeInterval) {
+    func videoPlayer(_ player: VideoPlayerable, updatedTotal time: Double) {
         updatePlayingInfo()
     }
     
-    func seekFinish() {
+    func videoPlayerSeekFinish(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }
 }
