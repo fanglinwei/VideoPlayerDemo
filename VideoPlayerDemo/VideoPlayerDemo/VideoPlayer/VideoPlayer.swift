@@ -20,12 +20,21 @@ enum VideoPlayer {
         case error
     }
     
-    static func instance(_ mode: VideoPlayer = .av) -> VideoPlayerable {
+    static func shared(_ mode: VideoPlayer = .av) -> VideoPlayerable {
         switch mode {
         case .av:
             return AVVideoPlayer.shared
         case .pl:
             return PLVideoPlayer.shared
+        }
+    }
+    
+    static func instance(_ mode: VideoPlayer = .av) -> VideoPlayerable {
+        switch mode {
+        case .av:
+            return AVVideoPlayer()
+        case .pl:
+            return PLVideoPlayer()
         }
     }
 }
