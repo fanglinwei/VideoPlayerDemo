@@ -5,6 +5,11 @@ class PLVideoPlayer: NSObject {
     
     static let shared = PLVideoPlayer()
     
+    /// 当前URL
+    var url: URL? {
+        return player?.url
+    }
+    
     /// 加载状态
     private(set) var loading: Bool = false {
         didSet {
@@ -50,6 +55,8 @@ class PLVideoPlayer: NSObject {
     }
     /// 是否后台播放
     var isBackground: Bool = false
+    /// 是否自动播放
+    var isAutoPlay: Bool = true
     /// 播放信息 (锁屏封面)
     var playingInfo: VideoPlayerInfo? {
         didSet {
@@ -74,6 +81,7 @@ class PLVideoPlayer: NSObject {
     private var playerView = VideoPlayerView(.none)
     private var userPaused: Bool = false
     private var seekCompletion: (() -> Void)?
+    private var ready: Bool = false
     
     override init() {
         super.init()
@@ -90,9 +98,19 @@ class PLVideoPlayer: NSObject {
     }
     
     private func setupNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sessionRouteChange(_:)),
+            name: AVAudioSession.routeChangeNotification,
+            object: AVAudioSession.sharedInstance()
+        )
         
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionInterruption(_:)), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sessionInterruption(_:)),
+            name: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance()
+        )
     }
     
     private func pauseNoUser() {
@@ -155,6 +173,7 @@ extension PLVideoPlayer {
     
     /// 清理
     private func clear() {
+        ready = false
         player?.stop()
         playingInfo = nil
         UIApplication.shared.endReceivingRemoteControlEvents()
@@ -197,11 +216,31 @@ extension PLVideoPlayer: PLPlayerDelegate {
         case .statusReady:
             print("准备完成")
             loading = false
+            
+        case .statusOpen:
+            print("开始连接")
+            loading = false
            
         case .statusPlaying:
             // 播放器正在播放的状态
             print("开始播放")
             loading = false
+            
+            if !ready {
+                if isAutoPlay {
+                    self.playTimer.fireDate = Date()
+                    self.userPaused = false
+                    self.state = .playing
+                    player.play()
+                    
+                } else {
+                    self.userPaused = true
+                    self.state = .paused
+                    player.pause()
+                }
+                ready = true
+                delegate { $0.videoPlayerReady(self) }
+            }
             
         case .statusPaused:
             // 播放器暂停的状态
@@ -316,19 +355,14 @@ extension PLVideoPlayer: VideoPlayerable {
         // 设置音频会话
         VideoPlayer.setupAudioSession()
         
-        DispatchQueue.main.async { [weak self] in
-            guard let this = self else { return }
-            
-            this.playTimer.fireDate = Date()
-            this.userPaused = false
-            this.state = .playing
-            player.play()
-        }
+        player.play()
         
         return playerView
     }
     
     func play() {
+        guard ready else { return }
+        
         playTimer.fireDate = Date()
         userPaused = false
         state = .playing
@@ -336,6 +370,8 @@ extension PLVideoPlayer: VideoPlayerable {
     }
     
     func pause() {
+        guard ready else { return }
+        
         userPaused = true
         state = .paused
         player?.pause()
@@ -349,6 +385,7 @@ extension PLVideoPlayer: VideoPlayerable {
     }
     
     func seek(to time: TimeInterval, completion: @escaping (() -> Void)) {
+        guard ready else { return }
         guard
             let player = player,
             player.status == .statusCaching ||

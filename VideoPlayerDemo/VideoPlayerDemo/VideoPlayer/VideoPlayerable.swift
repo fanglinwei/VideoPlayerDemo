@@ -14,6 +14,8 @@ protocol VideoPlayerable: NSObjectProtocol {
     /// 快速定位到指定播放时间点 (多次调用 以第一次为准)
     func seek(to time: TimeInterval, completion: @escaping (()->Void))
     
+    /// 当前URL
+    var url: URL? { get }
     /// 播放器当前状态
     var state: VideoPlayer.State { get }
     /// 播放器加载状态
@@ -33,8 +35,10 @@ protocol VideoPlayerable: NSObjectProtocol {
     var volume: Double { get set }
     /// 是否循环播放  默认: false
     var isLoop: Bool { get set }
-    /// 是允许后台播放  默认: false
+    /// 是否允许后台播放  默认: false
     var isBackground: Bool { get set }
+    /// 是否自动播放  默认: true
+    var isAutoPlay: Bool { get set }
     /// 设置播放信息
     var playingInfo: VideoPlayerInfo? { get set }
     

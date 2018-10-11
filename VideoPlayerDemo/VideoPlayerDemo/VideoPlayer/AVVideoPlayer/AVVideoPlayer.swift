@@ -6,6 +6,11 @@ class AVVideoPlayer: NSObject {
         
     static let shared = AVVideoPlayer()
     
+    /// 当前URL
+    var url: URL? {
+        return currentUrl
+    }
+    
     /// 加载状态
     private(set) var loading: Bool = false {
         didSet {
@@ -47,6 +52,8 @@ class AVVideoPlayer: NSObject {
     var isLoop: Bool = false
     /// 是否后台播放
     var isBackground: Bool = false
+    /// 是否自动播放
+    var isAutoPlay: Bool = true
     /// 播放信息 (锁屏封面和远程控制)
     var playingInfo: VideoPlayerInfo? {
         didSet {
@@ -65,6 +72,13 @@ class AVVideoPlayer: NSObject {
     private var playerTimeObserver: Any?
     private var userPaused: Bool = false
     private var isSeeking: Bool = false
+    private var ready: Bool = false
+    private var currentUrl: URL?
+    
+    private var itemStatusObservation: NSKeyValueObservation?
+    private var itemDurationObservation: NSKeyValueObservation?
+    private var itemLoadedTimeRangesObservation: NSKeyValueObservation?
+    private var itemPlaybackLikelyToKeepUpObservation: NSKeyValueObservation?
     
     private let kvo_item_status = "status"
     private let kvo_item_duration = "duration"
@@ -130,6 +144,7 @@ extension AVVideoPlayer {
     private func clear() {
         guard let item = player.currentItem else { return }
         
+        ready = false
         player.pause()
         
         // 移除监听
@@ -139,6 +154,7 @@ extension AVVideoPlayer {
         // 移除item
         player.replaceCurrentItem(with: nil)
         playingInfo = nil
+        currentUrl = nil
         
         UIApplication.shared.endReceivingRemoteControlEvents()
     }
@@ -162,57 +178,51 @@ extension AVVideoPlayer {
     }
     
     private func addObserver(item: AVPlayerItem) {
-        let options: NSKeyValueObservingOptions = [.new, .old]
-        item.addObserver(self, forKeyPath: kvo_item_status, options: options, context: nil)
-        item.addObserver(self, forKeyPath: kvo_item_duration, options: options, context: nil)
-        item.addObserver(self, forKeyPath: kvo_item_loadedTimeRanges, options: options, context: nil)
-        item.addObserver(self, forKeyPath: kvo_item_playbackLikelyToKeepUp, options: options, context: nil)
-    }
-    private func removeObserver(item: AVPlayerItem) {
-        item.removeObserver(self, forKeyPath: kvo_item_status)
-        item.removeObserver(self, forKeyPath: kvo_item_duration)
-        item.removeObserver(self, forKeyPath: kvo_item_loadedTimeRanges)
-        item.removeObserver(self, forKeyPath: kvo_item_playbackLikelyToKeepUp)
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        guard let change = change else { return }
-        guard let new = change[.newKey] else { return }
-        guard let old = change[.oldKey] else { return }
-        
-        if let item = object as? AVPlayerItem {
-            
-            switch keyPath {
-            case kvo_item_status:
-                // 状态 (判断是否新的与旧的相同 神奇的BUG)
-                guard let new = new as? Int else { return }
-                guard let old = old as? Int else { return }
-                guard new != old else { return }
-                switch AVPlayerItem.Status(rawValue: new) ?? .unknown {
+        do {
+            let observation = item.observe(\.status) {
+                [weak self] (observer, change) in
+                guard let this = self else { return }
+                
+                switch observer.status {
                 case .unknown: break
                 case .readyToPlay:
-                    // 播放
-                    play()
+                    if this.isAutoPlay {
+                        this.player.play()
+                        this.userPaused = false
+                        this.state = .playing
+                        
+                    } else {
+                        this.player.pause()
+                        this.userPaused = true
+                        this.state = .paused
+                    }
+                    this.ready = true
+                    this.delegate { $0.videoPlayerReady(this) }
                     
                 case .failed:
                     // 异常
                     print(item.error?.localizedDescription ?? "无法获取错误信息")
-                    error()
+                    this.error()
                 }
-                
-            case kvo_item_duration:
+            }
+            itemStatusObservation = observation
+        }
+        do {
+            let observation = item.observe(\.duration) {
+                [weak self] (observer, change) in
+                guard let this = self else { return }
                 // 获取总时长
-                if let time = totalTime {
-                    delegate { $0.videoPlayer(self, updatedTotal: time) }
-                }
-                
-            case kvo_item_loadedTimeRanges:
-                // 加载
-                guard let timeRange = item.loadedTimeRanges.first as? CMTimeRange else { return }
-                guard let totalTime = totalTime else { return }
+                let time = observer.duration.seconds
+                this.delegate { $0.videoPlayer(this, updatedTotal: time) }
+            }
+            itemDurationObservation = observation
+        }
+        do {
+            let observation = item.observe(\.loadedTimeRanges) {
+                [weak self] (observer, change) in
+                guard let this = self else { return }
+                guard let timeRange = observer.loadedTimeRanges.first as? CMTimeRange else { return }
+                guard let totalTime = this.totalTime else { return }
                 // 本次缓冲时间范围
                 let start = timeRange.start.seconds
                 let duration = timeRange.duration.seconds
@@ -221,23 +231,25 @@ extension AVVideoPlayer {
                 // 缓冲进度
                 let progress = totalBuffer / totalTime
                 
-                print("""
-                    ==========av===========
-                    duration \(totalBuffer)
-                    totalDuration \(totalTime)
-                    progress \(progress)\n
-                    """)
-                delegate { $0.videoPlayer(self, updatedBuffer: progress) }
-                
-            case kvo_item_playbackLikelyToKeepUp:
-                // 缓存是否可以播放
-                guard let isKeep = new as? Bool else { return }
-                
-                loading = !isKeep
-                
-            default: break
+                this.delegate { $0.videoPlayer(this, updatedBuffer: progress) }
             }
+            itemLoadedTimeRangesObservation = observation
         }
+        do {
+            let observation = item.observe(\.isPlaybackLikelyToKeepUp) {
+                [weak self] (observer, change) in
+                guard let this = self else { return }
+                
+                this.loading = !observer.isPlaybackLikelyToKeepUp
+            }
+            itemPlaybackLikelyToKeepUpObservation = observation
+        }
+    }
+    private func removeObserver(item: AVPlayerItem) {
+        itemStatusObservation?.invalidate()
+        itemDurationObservation?.invalidate()
+        itemLoadedTimeRangesObservation?.invalidate()
+        itemPlaybackLikelyToKeepUpObservation?.invalidate()
     }
 }
 
@@ -326,6 +338,7 @@ extension AVVideoPlayer: VideoPlayerable {
         
         clear()
         
+        currentUrl = url
         let item = AVPlayerItem(url: url)
         item.canUseNetworkResourcesForLiveStreamingWhilePaused = true
         player = AVPlayer(playerItem: item)
@@ -355,7 +368,7 @@ extension AVVideoPlayer: VideoPlayerable {
     }
     
     func play() {
-        guard player.currentItem?.status == .readyToPlay else { return }
+        guard ready else { return }
         
         player.play()
         userPaused = false
@@ -363,6 +376,8 @@ extension AVVideoPlayer: VideoPlayerable {
     }
     
     func pause() {
+        guard ready else { return }
+        
         player.pause()
         userPaused = true
         state = .paused
@@ -375,6 +390,7 @@ extension AVVideoPlayer: VideoPlayerable {
     }
     
     func seek(to time: TimeInterval, completion: @escaping (() -> Void)) {
+        guard ready else { return }
         guard
             let item = player.currentItem,
             player.status == .readyToPlay,

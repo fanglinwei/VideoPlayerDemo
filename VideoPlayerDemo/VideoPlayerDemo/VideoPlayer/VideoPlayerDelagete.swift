@@ -1,6 +1,8 @@
 import Foundation
 
 protocol VideoPlayerDelagete: AnyObject {
+    /// 准备完成
+    func videoPlayerReady(_ player: VideoPlayerable)
     /// 播放中
     func videoPlayerPlaying(_ player: VideoPlayerable)
     /// 加载开始
@@ -28,6 +30,7 @@ protocol VideoPlayerDelagete: AnyObject {
 
 extension VideoPlayerDelagete {
     
+    func videoPlayerReady(_ player: VideoPlayerable) { }
     func videoPlayerPlaying(_ player: VideoPlayerable) { }
     func videoPlayerLoadingBegin(_ player: VideoPlayerable) { }
     func videoPlayerLoadingEnd(_ player: VideoPlayerable) { }

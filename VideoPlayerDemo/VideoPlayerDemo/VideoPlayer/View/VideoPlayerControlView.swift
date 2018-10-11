@@ -32,6 +32,11 @@ protocol VideoPlayerControlViewable: NSObjectProtocol {
     /// 加载状态
     func loadingBegin()
     func loadingEnd()
+    
+    /// 设置启用 (当准备完成时可以启用子控件, 未准备完成时禁用子控件)
+    ///
+    /// - Parameter enabled: true or false
+    func set(enabled: Bool)
 }
 
 protocol VideoPlayerControlViewDelegate: NSObjectProtocol {
@@ -55,6 +60,7 @@ class VideoPlayerControlView: UIView {
     }( UIActivityIndicatorView() )
     
     lazy var stateButton: UIButton = {
+        $0.isUserInteractionEnabled = false
         $0.bounds = CGRect(x: 0, y: 0, width: 66, height: 66)
         $0.setImage(#imageLiteral(resourceName: "video_play"), for: .normal)
         $0.setImage(#imageLiteral(resourceName: "video_pause"), for: .selected)
@@ -75,6 +81,7 @@ class VideoPlayerControlView: UIView {
     }( UIProgressView() )
     
     lazy var sliderView: VideoPlayerSlider = {
+        $0.isEnabled = false
         $0.setThumbImage(#imageLiteral(resourceName: "video_slider"), for: .normal)
         $0.minimumTrackTintColor = .cyan
         $0.maximumTrackTintColor = .clear
@@ -289,6 +296,11 @@ extension VideoPlayerControlView: VideoPlayerControlViewable {
     
     func loadingEnd() {
         loadingView.stopAnimating()
+    }
+    
+    func set(enabled: Bool) {
+        sliderView.isEnabled = enabled
+        stateButton.isUserInteractionEnabled = enabled
     }
 }
 

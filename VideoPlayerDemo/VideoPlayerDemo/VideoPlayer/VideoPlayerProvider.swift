@@ -76,6 +76,10 @@ extension VideoPlayerProvider: VideoPlayerDelagete {
         controlView?.loadingEnd()
     }
     
+    func videoPlayerReady(_ player: VideoPlayerable) {
+        controlView?.set(enabled: true)
+    }
+    
     func videoPlayerPlaying(_ player: VideoPlayerable) {
         controlView?.set(state: true)
         controlView?.isHidden = false
@@ -93,6 +97,7 @@ extension VideoPlayerProvider: VideoPlayerDelagete {
     }
     
     func videoPlayerStopped(_ player: VideoPlayerable) {
+        controlView?.set(enabled: false)
         controlView?.isHidden = true
         finishView?.isHidden = true
         errorView?.isHidden = true
@@ -107,6 +112,7 @@ extension VideoPlayerProvider: VideoPlayerDelagete {
     }
     
     func videoPlayerError(_ player: VideoPlayerable) {
+        controlView?.set(enabled: false)
         controlView?.isHidden = true
         finishView?.isHidden = true
         errorView?.isHidden = false

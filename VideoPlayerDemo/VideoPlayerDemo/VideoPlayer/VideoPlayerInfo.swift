@@ -83,6 +83,10 @@ class VideoPlayerInfo: VideoPlayerDelagete {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
+    func videoPlayerReady(_ player: VideoPlayerable) {
+        updatePlayingInfo()
+    }
+    
     func videoPlayerLoadingBegin(_ player: VideoPlayerable) {
         updatePlayingInfo()
     }

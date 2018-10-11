@@ -43,7 +43,7 @@ class ViewController: UIViewController {
             cover: coverView
         ) { [weak self] in
             guard let this = self else { return }
-            
+            player.isAutoPlay = false   
             player.prepare(url: url)
             this.playerView.subviews.forEach({ $0.removeFromSuperview() })
             this.playerView.addSubview(player.view)
