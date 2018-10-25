@@ -53,4 +53,17 @@ extension VideoPlayer {
             }
         }
     }
+    
+    static func removeAudioSession() {
+        UIApplication.shared.endReceivingRemoteControlEvents()
+        DispatchQueue.global().async {
+            do {
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, mode: .moviePlayback)
+                try session.setActive(false)
+            } catch {
+                print("音频会话创建失败")
+            }
+        }
+    }
 }

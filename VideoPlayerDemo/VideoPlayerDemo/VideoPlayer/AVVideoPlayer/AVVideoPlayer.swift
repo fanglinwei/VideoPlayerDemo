@@ -156,7 +156,7 @@ extension AVVideoPlayer {
         playingInfo = nil
         currentUrl = nil
         
-        UIApplication.shared.endReceivingRemoteControlEvents()
+        VideoPlayer.removeAudioSession()
     }
     
     private func addObserver() {

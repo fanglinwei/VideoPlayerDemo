@@ -176,7 +176,7 @@ extension PLVideoPlayer {
         ready = false
         player?.stop()
         playingInfo = nil
-        UIApplication.shared.endReceivingRemoteControlEvents()
+        VideoPlayer.removeAudioSession()
     }
     
     /// 错误
