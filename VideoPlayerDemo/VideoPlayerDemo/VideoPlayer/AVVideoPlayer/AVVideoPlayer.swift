@@ -257,6 +257,9 @@ extension AVVideoPlayer {
     
     /// 播放结束通知
     @objc func itemDidPlayToEndTime(_ notification: NSNotification) {
+        guard notification.object as? AVPlayerItem == player.currentItem else {
+            return
+        }
         pause()
         seek(to: 0.0) { [weak self] in
             guard let this = self else { return }
@@ -271,6 +274,9 @@ extension AVVideoPlayer {
     
     /// 播放异常通知
     @objc func itemPlaybackStalled(_ notification: NSNotification) {
+        guard notification.object as? AVPlayerItem == player.currentItem else {
+            return
+        }
         if state == .playing { play() }
     }
     
