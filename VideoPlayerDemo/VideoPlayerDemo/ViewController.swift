@@ -29,13 +29,13 @@ class ViewController: UIViewController {
         view.addSubview(errorView)
         view.addSubview(finishView)
         
-        let url = URL(string: "https://devstreaming-cdn.apple.com/videos/tutorials/20170912/801xy9x7h32rn/designing_for_iphone_x/hls_vod_mvp.m3u8")!
+//        let url = URL(string: "https://devstreaming-cdn.apple.com/videos/tutorials/20170912/801xy9x7h32rn/designing_for_iphone_x/hls_vod_mvp.m3u8")!
         
-//        let url = URL(string: "https://p-events-delivery.akamaized.net/189kljhbasdcvjhasbdscvoahsbdcvaoshdbvaosdhbvasodhjbv/m3u8/hls_vod_mvp.m3u8")!
+        let url = URL(string: "https://p-events-delivery.akamaized.net/189kljhbasdcvjhasbdscvoahsbdcvaoshdbvaosdhbvasodhjbv/m3u8/hls_vod_mvp.m3u8")!
         
         coverView.imageView.image = #imageLiteral(resourceName: "video_cover")
         
-        let player = VideoPlayer.instance(.av)
+        let player = VideoPlayer.instance(.pl)
         let provider = VideoPlayerProvider(
             control: controlView,
             finish: finishView,

@@ -1,7 +1,7 @@
 PODS:
-  - PLPlayerKit (3.3.3):
-    - PLPlayerKit/iphoneos (= 3.3.3)
-  - PLPlayerKit/iphoneos (3.3.3)
+  - PLPlayerKit (3.4.0):
+    - PLPlayerKit/iphoneos (= 3.4.0)
+  - PLPlayerKit/iphoneos (3.4.0)
 
 DEPENDENCIES:
   - PLPlayerKit
@@ -11,7 +11,7 @@ SPEC REPOS:
     - PLPlayerKit
 
 SPEC CHECKSUMS:
-  PLPlayerKit: 8089fa9ae8e2169cd5b3f1deb60041c676dc55e5
+  PLPlayerKit: e6ad0e14a1c49db4befab201c2701d26489314e8
 
 PODFILE CHECKSUM: e70543b34a08a288f61eb18c0a6403213da964cf
 
