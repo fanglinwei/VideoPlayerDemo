@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         
         coverView.imageView.image = #imageLiteral(resourceName: "video_cover")
         
-        let player = VideoPlayer.instance(.pl)
+        let player = VideoPlayer.av.instance()
         let provider = VideoPlayerProvider(
             control: controlView,
             finish: finishView,
@@ -43,7 +43,9 @@ class ViewController: UIViewController {
             cover: coverView
         ) { [weak self] in
             guard let this = self else { return }
-            player.isAutoPlay = false   
+            
+            player.isAutoPlay = false
+            player.isBackground = true
             player.prepare(url: url)
             this.playerView.subviews.forEach({ $0.removeFromSuperview() })
             this.playerView.addSubview(player.view)

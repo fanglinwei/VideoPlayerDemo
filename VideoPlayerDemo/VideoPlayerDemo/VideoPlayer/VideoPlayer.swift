@@ -3,9 +3,6 @@ import UIKit
 import AVFoundation
 
 enum VideoPlayer {
-    case av
-    case pl
-    
     /// 播放状态
     enum State {
         /// 播放中
@@ -19,24 +16,13 @@ enum VideoPlayer {
         /// 播出出错
         case error
     }
+}
+
+extension VideoPlayer {
     
-    static func shared(_ mode: VideoPlayer = .av) -> VideoPlayerable {
-        switch mode {
-        case .av:
-            return AVVideoPlayer.shared
-        case .pl:
-            return PLVideoPlayer.shared
-        }
-    }
+    static let av: Builder = .init { AVVideoPlayer() }
     
-    static func instance(_ mode: VideoPlayer = .av) -> VideoPlayerable {
-        switch mode {
-        case .av:
-            return AVVideoPlayer()
-        case .pl:
-            return PLVideoPlayer()
-        }
-    }
+    static let pl: Builder = .init { PLVideoPlayer() }
 }
 
 extension VideoPlayer {
@@ -47,7 +33,7 @@ extension VideoPlayer {
             do {
                 let session = AVAudioSession.sharedInstance()
                 try session.setCategory(.playback, mode: .default)
-                try session.setActive(true)
+                try session.setActive(true, options: [.notifyOthersOnDeactivation])
             } catch {
                 print("音频会话创建失败")
             }
@@ -60,10 +46,30 @@ extension VideoPlayer {
             do {
                 let session = AVAudioSession.sharedInstance()
                 try session.setCategory(.playback, mode: .moviePlayback)
-                try session.setActive(false)
+                try session.setActive(false, options: [.notifyOthersOnDeactivation])
             } catch {
                 print("音频会话创建失败")
             }
+        }
+    }
+}
+
+extension VideoPlayer {
+    
+    class Builder {
+        
+        typealias Generator = () -> VideoPlayerable
+        
+        private var generator: Generator
+        
+        private(set) lazy var shared = generator()
+        
+        init(_ generator: @escaping Generator) {
+            self.generator = generator
+        }
+        
+        func instance() -> VideoPlayerable {
+            return generator()
         }
     }
 }
